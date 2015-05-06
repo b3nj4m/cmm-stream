@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/b3nj4m/cmm-stream/issues"
   },
-  "homepage": "https://github.com/b3nj4m/cmm-stream#readme"
+  "homepage": "https://github.com/b3nj4m/cmm-stream#readme",
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "mocha": "^2.2.4"
+  }
 }
