@@ -23,7 +23,7 @@ Construct a new writable Cmm (extends [`Stream.Writable`](https://nodejs.org/api
 
 * `width` - the width of the table. Higher values reduce the magnitude of the frequency error (default 10).
 * `depth` - the depth of the table. Higher values reduce the probability of large frequency error (default 10).
-* `hashType` - which hashing algorithm to use on the values. Can be any algorithm supported by [`crypto.createHash`](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) (default: `'sha1'`).
+* `hashType` - which hashing algorithm to use on the values. Can be any algorithm supported by [`crypto.createHash`](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) (default: `'whirlpool'`).
 * `streamOpts` - the options to pass along to the stream constructor.
  
 #### Hll.frequency(value)
