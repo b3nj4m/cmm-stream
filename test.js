@@ -28,6 +28,7 @@ describe('cmm', function() {
 
   var totalError = 0;
   var totalAcceptableError = 0;
+  var totalTests = 0;
 
   describe('frequency', function() {
     for (var i = 2; i < 24; i++) {
@@ -38,6 +39,8 @@ describe('cmm', function() {
     }
 
     it('should have acceptable average error rate', function() {
+      console.log('total error', totalError, 'total acceptable error', totalAcceptableError);
+      console.log('average error', totalError / totalTests);
       expect(totalError).to.be.at.most(totalAcceptableError);
     });
   });
@@ -46,7 +49,7 @@ describe('cmm', function() {
     it('should count about ' + numElements + ' ' + elementType + ' using w:' + width + ', d:' + depth, function(done) {
       var c = new CMM(width, depth);
       var rs = new Stream.Readable();
-      var size = width * depth;
+      var size = 10 * width * depth;
       var element = elementType === 'strings' ? '42' : new Buffer([0x42]);
       var i = 0;
 
@@ -75,6 +78,7 @@ describe('cmm', function() {
 
         totalError += Math.abs(frequency - numElements);
         totalAcceptableError += (2 * c.total) / width;
+        totalTests++;
 
         done();
       });

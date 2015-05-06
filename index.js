@@ -8,7 +8,7 @@ function CMM(width, depth, hashType, streamOpts) {
   this.depth = depth || 10;
   this.size = this.width * this.depth;
   this.registers = new Array(this.size);
-  this.hashType = hashType || 'sha1';
+  this.hashType = hashType || 'whirlpool';
   this.total = 0;
 
   for (i = 0; i < this.registers.length; i++) {
@@ -21,7 +21,7 @@ CMM.prototype.constructor = CMM;
 
 CMM.prototype.hash = function(value, idx) {
   var hash = crypto.createHash(this.hashType).update(value).digest();
-  var idx = idx % (hash.length - 4);
+  idx = Math.pow(idx, 7) % (hash.length - 4);
   return Math.abs(hash.readInt32LE(idx, idx + 4)) % this.width;
 };
 
