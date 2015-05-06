@@ -1,12 +1,11 @@
 var Stream = require('stream');
 var crypto = require('crypto');
 
-function CMM(width, depth, topSize, hashType, streamOpts) {
+function CMM(width, depth, hashType, streamOpts) {
   Stream.Writable.call(this, streamOpts);
 
   this.width = width || 10;
   this.depth = depth || 10;
-  this.topSize = topSize || 0;
   this.size = this.width * this.depth;
   this.registers = new Array(this.size);
   this.hashType = hashType || 'sha1';
