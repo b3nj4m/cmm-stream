@@ -1,0 +1,24 @@
+{
+  "name": "cmm-stream",
+  "version": "0.1.0",
+  "description": "Stream-based count-mean-min sketch",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/b3nj4m/cmm-stream.git"
+  },
+  "keywords": [
+    "count-mean-min",
+    "stream",
+    "frequency"
+  ],
+  "author": "Ben Robbins <ben.robbins@gmail.com> (https://b3nj4m.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/b3nj4m/cmm-stream/issues"
+  },
+  "homepage": "https://github.com/b3nj4m/cmm-stream#readme"
+}
