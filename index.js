@@ -57,7 +57,7 @@ CMM.prototype.frequency = function(value) {
     results[i] = counter - error;
   }
 
-  return results.sort()[Math.round(this.depth / 2)];
+  return Math.round(results.sort()[Math.round(this.depth / 2)]);
 };
 
 module.exports = CMM;
