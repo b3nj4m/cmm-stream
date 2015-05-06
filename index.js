@@ -9,16 +9,8 @@ function CMM(width, depth, topSize, hashType, streamOpts) {
   this.topSize = topSize || 0;
   this.size = this.width * this.depth;
   this.registers = new Array(this.size);
-  this.hashVector1 = new Array(this.depth);
-  this.hashVector2 = new Array(this.depth);
-  this.prime = Math.pow(2, 31) - 1;
+  this.hashType = hashType || 'sha1';
   this.total = 0;
-
-  for (var i = 0; i < this.depth; i++) {
-    //TODO are randoms really necessary? would be nice to have some determinism
-    this.hashVector1[i] = Math.round(Math.random() * this.prime);
-    this.hashVector2[i] = Math.round(Math.random() * this.prime);
-  }
 
   for (i = 0; i < this.registers.length; i++) {
     this.registers[i] = 0;
@@ -29,7 +21,9 @@ CMM.prototype = Object.create(Stream.Writable.prototype);
 CMM.prototype.constructor = CMM;
 
 CMM.prototype.hash = function(value, idx) {
-  return ((this.hashVector1[idx] * value + this.hashVector2[idx]) % this.prime) % this.width;
+  var hash = crypto.createHash(this.hashType).update(value).digest();
+  var idx = idx % (hash.length - 4);
+  return Math.abs(hash.readInt32LE(idx, idx + 4)) % this.width;
 };
 
 CMM.prototype.write = function(chunk, enc, next) {
