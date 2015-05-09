@@ -26,6 +26,29 @@ Construct a new writable Cmm (extends [`Stream.Writable`](https://nodejs.org/api
 * `hashType` - which hashing algorithm to use on the values. Can be any algorithm supported by [`crypto.createHash`](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) (default: `'whirlpool'`).
 * `streamOpts` - the options to pass along to the stream constructor.
  
-#### Hll.frequency(value)
+#### Cmm.frequency(value)
 
 Compute the approximate frequency of `value`.
+
+#### Cmm.export()
+
+Export the Cmm data. Returns an object like:
+
+```javascript
+{
+  width: 10,
+  depth: 10,
+  hashType: 'whirlpool',
+  total: 100000,
+  registers: [...]
+}
+```
+
+#### Cmm.import(data)
+
+Import a Cmm data object. Replaces existing data.
+
+#### Cmm.merge(cmm)
+
+Merge this Cmm with another Cmm, creating a new instance. Width, depth, and hash-type must match between the two.
+
