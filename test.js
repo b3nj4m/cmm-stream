@@ -28,7 +28,7 @@ describe('cmm', function() {
 
   describe('import/export', function() {
     it('should export', function(done) {
-      makeCmm(10, 10, 10, 'whirlpool', 'buffers', function(cmm) {
+      makeCmm(10, 10, 10, 'murmur', 'buffers', function(cmm) {
         var data = cmm.export();
         expect(data.width).to.equal(cmm.width);
         expect(data.depth).to.equal(cmm.depth);
@@ -39,7 +39,7 @@ describe('cmm', function() {
       });
     });
     it('should import exported data', function(done) {
-      makeCmm(10, 10, 10, 'whirlpool', 'buffers', function(cmm, element) {
+      makeCmm(10, 10, 10, 'murmur', 'buffers', function(cmm, element) {
         var newCmm = new CMM();
         newCmm.import(cmm.export());
         expect(newCmm.width).to.equal(cmm.width);
@@ -56,8 +56,8 @@ describe('cmm', function() {
 
   describe('merge', function() {
     it('should merge', function(done) {
-      makeCmm(20, 20, 10, 'whirlpool', 'buffers', function(cmm1) {
-        makeCmm(20, 20, 10, 'whirlpool', 'buffers', function(cmm2, element) {
+      makeCmm(20, 20, 10, 'murmur', 'buffers', function(cmm1) {
+        makeCmm(20, 20, 10, 'murmur', 'buffers', function(cmm2, element) {
           var cmm3 = cmm1.merge(cmm2);
           expect(cmm3.width).to.equal(cmm1.width);
           expect(cmm3.depth).to.equal(cmm1.depth);
@@ -94,7 +94,7 @@ describe('cmm', function() {
   });
 
   function makeCmm(width, depth, numElements, hashType, elementType, callback) {
-    var c = new CMM(width, depth, hashType);
+    var c = new CMM(width, depth, 42, hashType);
     var rs = new Stream.Readable();
     var size = 10 * width * depth;
     var element = elementType === 'strings' ? '42' : new Buffer([0x42]);

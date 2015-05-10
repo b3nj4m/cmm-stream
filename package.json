@@ -24,5 +24,8 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "mocha": "^2.2.4"
+  },
+  "dependencies": {
+    "murmur-hash-js": "^1.0.0"
   }
 }

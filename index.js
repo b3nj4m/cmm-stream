@@ -1,16 +1,26 @@
 var Stream = require('stream');
 var crypto = require('crypto');
+var murmur = require('murmur-hash-js');
 
-function CMM(width, depth, hashType, streamOpts) {
+var hashFns = {
+  murmur: function(seed, key) {
+    return murmur.murmur3(key, seed) % this.size;
+  }
+};
+
+function CMM(width, depth, seed, hashType, streamOpts) {
   Stream.Writable.call(this, streamOpts);
 
   this.streamOpts = streamOpts;
   this.width = width || 10;
   this.depth = depth || 10;
+  this.seed = seed || 42;
   this.computeConstants();
   this.registers = new Array(this.size);
-  this.hashType = hashType || 'whirlpool';
+  this.hashType = hashType || 'murmur';
   this.total = 0;
+
+  this.setHashes();
 
   for (i = 0; i < this.registers.length; i++) {
     this.registers[i] = 0;
@@ -24,15 +34,26 @@ CMM.prototype.computeConstants = function() {
   this.size = this.width * this.depth;
 };
 
-CMM.prototype.hash = function(value, idx) {
-  var hash = crypto.createHash(this.hashType).update(value).digest();
-  idx = Math.pow(idx, 7) % (hash.length - 4);
-  return Math.abs(hash.readInt32LE(idx, idx + 4)) % this.width;
+CMM.prototype.setHashes = function() {
+  this.hash = hashFns[this.hashType] || this.cryptoHash;
+  this.hashes = new Array(this.depth);
+
+  for (i = 0; i < this.hashes.length; i++) {
+    this.hashes[i] = this.hash.bind(this, this.seed + i);
+  }
+};
+
+CMM.prototype.cryptoHash = function(seed, key) {
+  if (!Buffer.isBuffer(key)) {
+    key = new Buffer(key);
+  }
+  key = Buffer.concat([new Buffer([seed]), key]);
+  return Math.abs(crypto.createHash(this.hashType).update(key).digest().readInt32LE(0, 4)) % this.width;
 };
 
 CMM.prototype.write = function(chunk, enc, next) {
   for (var i = 0; i < this.depth; i++) {
-    this.registers[i * this.width + this.hash(chunk, i)]++;
+    this.registers[i * this.width + this.hashes[i](chunk)]++;
   }
 
   this.total++;
@@ -50,7 +71,7 @@ CMM.prototype.frequency = function(value) {
   var error;
 
   for (var i = 0; i < this.depth; i++) {
-    counter = this.registers[i * this.width + this.hash(value, i)];
+    counter = this.registers[i * this.width + this.hashes[i](value)];
     error = (this.total - counter) / (this.width - 1);
     results[i] = counter - error;
   }
@@ -62,6 +83,7 @@ CMM.prototype.export = function() {
   return {
     width: this.width,
     depth: this.depth,
+    seed: this.seed,
     hashType: this.hashType,
     total: this.total,
     registers: this.registers.slice()
@@ -71,10 +93,12 @@ CMM.prototype.export = function() {
 CMM.prototype.import = function(data) {
   this.width = data.width;
   this.depth = data.depth;
+  this.seed = data.seed;
   this.hashType = data.hashType;
   this.registers = data.registers.slice();
   this.total = data.total;
   this.computeConstants();
+  this.setHashes();
 };
 
 CMM.prototype.merge = function(cmm) {
@@ -86,11 +110,15 @@ CMM.prototype.merge = function(cmm) {
     throw Error('Depths of the Cmms must match.');
   }
 
+  if (cmm.seed !== this.seed) {
+    throw Error('Seeds of the Cmms must match.');
+  }
+
   if (cmm.hashType !== this.hashType) {
     throw Error('HashTypes of the Cmms must match.');
   }
 
-  var result = new CMM(cmm.width, cmm.depth, cmm.hashType, this.streamOpts);
+  var result = new CMM(this.width, this.depth, this.seed, this.hashType, this.streamOpts);
 
   result.total = this.total + cmm.total;
 

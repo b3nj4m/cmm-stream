@@ -3,7 +3,7 @@
 A stream-based Count-mean-min sketch implementation. Pipe in some strings/buffers to get frequency estimation.
 
 ```javascript
-var c = new Cmm();
+var c = new Cmm(20, 20);
 
 //...
 
@@ -21,9 +21,10 @@ c.on('finish', function() {
 
 Construct a new writable Cmm (extends [`Stream.Writable`](https://nodejs.org/api/stream.html#stream_class_stream_writable)).
 
-* `width` - the width of the table. Higher values reduce the magnitude of the frequency error (default 10).
-* `depth` - the depth of the table. Higher values reduce the probability of large frequency error (default 10).
-* `hashType` - which hashing algorithm to use on the values. Can be any algorithm supported by [`crypto.createHash`](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) (default: `'whirlpool'`).
+* `width` - the width of the table. Higher values reduce the magnitude of the frequency error (default `10`).
+* `depth` - the depth of the table. Higher values reduce the probability of large frequency error (default `10`).
+* `seed` - the seed integer for the hash functions (default `42`).
+* `hashType` - which hashing algorithm to use on the values. Can be `'murmur'` or any algorithm supported by [`crypto.createHash`](https://nodejs.org/api/crypto.html#crypto_crypto_createhash_algorithm) (default: `'murmur'`).
 * `streamOpts` - the options to pass along to the stream constructor.
  
 #### Cmm.frequency(value)
@@ -38,6 +39,7 @@ Export the Cmm data. Returns an object like:
 {
   width: 10,
   depth: 10,
+  seed: 42,
   hashType: 'whirlpool',
   total: 100000,
   registers: [...]
@@ -50,5 +52,5 @@ Import a Cmm data object. Replaces existing data.
 
 #### Cmm.merge(cmm)
 
-Merge this Cmm with another Cmm, creating a new instance. Width, depth, and hash-type must match between the two.
+Merge this Cmm with another Cmm, creating a new instance. `width`, `depth`, `seed`, and `hashType` must match between the two.
 
