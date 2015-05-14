@@ -32,6 +32,8 @@ CMM.prototype.constructor = CMM;
 
 CMM.prototype.computeConstants = function() {
   this.size = this.width * this.depth;
+  this.nextCounter = 0;
+  this.nextLimit = 1000;
 };
 
 CMM.prototype.setHashes = function() {
@@ -51,7 +53,7 @@ CMM.prototype.cryptoHash = function(seed, key) {
   return Math.abs(crypto.createHash(this.hashType).update(key).digest().readInt32LE(0, 4)) % this.width;
 };
 
-CMM.prototype.write = function(chunk, enc, next) {
+CMM.prototype._write = function(chunk, enc, next) {
   for (var i = 0; i < this.depth; i++) {
     this.registers[i * this.width + this.hashes[i](chunk)]++;
   }
@@ -59,7 +61,13 @@ CMM.prototype.write = function(chunk, enc, next) {
   this.total++;
 
   if (next) {
-    next();
+    this.nextCounter = (this.nextCounter + 1) % this.nextLimit;
+    if (this.nextCounter === 0) {
+      setTimeout(next, 0);
+    }
+    else {
+      next();
+    }
   }
 
   return true;
