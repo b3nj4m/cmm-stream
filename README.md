@@ -3,11 +3,15 @@
 A stream-based Count-mean-min sketch implementation. Pipe in some strings/buffers to get frequency estimation.
 
 ```javascript
+var Cmm = require('cmm-stream');
+var es = require('event-stream');
+var fs = require('fs');
+
 var c = new Cmm(20, 20);
 
-//...
-
-myDataSource.pipe(c);
+fs.createReadStream('data.txt')
+  .pipe(es.split())
+  .pipe(c);
 
 c.on('finish', function() {
   console.log(c.frequency('42'));
